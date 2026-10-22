@@ -1,0 +1,648 @@
+# Prompt Log — Monster Interview
+
+Rule: only record things that actually happened. Leave a field blank until it is true.
+
+---
+
+## Step 0 — Planning (no code)
+- **Objective:** Agree on architecture, token budget, guardrails, and a step-by-step build plan before writing code.
+- **My prompt (original, verbatim):**
+
+<details>
+<summary>Click to expand the full original prompt</summary>
+
+```text
+MONSTER INTERVIEW — NEXT CHAPTER WEEK 6 PROJECT
+
+Your role
+
+You are my senior full-stack development partner, technical mentor, and code reviewer.
+
+I am a beginner developer enrolled in the Next Chapter AI Engineering program. I am learning Next.js, React, JavaScript, APIs, back-end development, Git, and responsible AI engineering.
+
+I use Claude Code inside VS Code to assist with development, but I want to understand the code and make important decisions myself.
+
+CRITICAL: We are starting in PLAN MODE ONLY. Do not create files, modify code, install packages, run migrations, or begin implementation until I explicitly approve the plan.
+
+Do not try to build the complete project in one pass.
+
+1. Project overview
+
+Project name: Monster Interview
+
+Tagline: The scariest job interview you'll ever love.
+
+Create a fun, polished, Halloween-themed mock interview web application with real AI-powered interview feedback.
+
+The Halloween experience is the initial theme. The underlying application should be structured so that it could eventually become a real interview preparation tool for students, young professionals, and jobseekers.
+
+User experience
+
+User visits a modern, interactive landing page.
+
+User sees a selection of fictional monster interviewers.
+
+User chooses an interview category.
+
+User begins a three-question interview.
+
+User types an answer to each question.
+
+User progresses through the interview with clear visual feedback.
+
+After completing all three questions, the user clicks "Reveal My Fate."
+
+The app makes a secure AI API call to evaluate the answers.
+
+User receives a visually engaging feedback report.
+
+User can restart the experience.
+
+Characters
+
+Design three interviewer character concepts:
+
+Count Dracula: A theatrical, demanding corporate CEO who values confident communication.
+
+Zombie Boss: A chaotic, distracted interviewer with a playful personality.
+
+Friendly Ghost: An encouraging interviewer who makes nervous applicants comfortable.
+
+For MVP, only Dracula must be functional. Other characters can appear as clearly labeled future options.
+
+Do not implement extra character personalities unless the core application is complete and tested.
+
+Interview categories
+
+Start with a limited selection:
+
+Entry-Level Job
+
+Internship
+
+Leadership / Fellowship
+
+Use a small set of predetermined questions stored in the project, rather than generating questions through the AI API.
+
+Keep three questions per interview.
+
+2. Design requirements
+
+I want the website to feel like a polished, modern interactive game, not a basic chatbot or a generic form.
+
+Visual inspiration: modern game menus, interactive storytelling, polished web apps, and playful Halloween experiences.
+
+Design direction
+
+Dark purple or near-black backgrounds.
+
+Vibrant orange highlights.
+
+Neon purple accents.
+
+High-quality character presentation.
+
+Modern typography.
+
+Responsive cards and buttons.
+
+Smooth but lightweight transitions.
+
+Hover effects and interactive feedback.
+
+Clear progress indicator (Question 1 of 3).
+
+An immersive interview screen.
+
+A dramatic but readable final results screen.
+
+The interface should feel playful, premium, and inviting—not genuinely frightening.
+
+Required screens
+
+Screen 1: Welcome / Landing
+
+Monster Interview branding.
+
+Halloween-inspired visual treatment.
+
+Tagline.
+
+Prominent "Enter the Interview" action.
+
+Character selection.
+
+Screen 2: Interview Setup
+
+Character selected.
+
+Interview category.
+
+Explanation of the three-question challenge.
+
+Start Interview button.
+
+Screen 3: Interview Experience
+
+Character portrait or visual identity.
+
+Interview question.
+
+Textarea for user response.
+
+Question counter / progress bar.
+
+Next Question button.
+
+Clear validation feedback.
+
+Back navigation that preserves previously entered answers.
+
+Screen 4: AI Feedback Results
+
+Playful interview outcome heading.
+
+Overall qualitative assessment.
+
+Two or three strengths.
+
+Two or three improvement suggestions.
+
+One improved example answer grounded in the user's actual response.
+
+Option to restart the interview.
+
+The result should not pretend to be a real hiring decision.
+
+Design implementation
+
+Use React components and standard CSS or CSS Modules.
+
+Avoid adding large UI libraries or unnecessary dependencies.
+
+Build reusable components where practical.
+
+Prioritize accessibility, mobile responsiveness, readable contrast, and clear loading/error states.
+
+If character artwork is not available, propose a simple, maintainable visual solution without making image generation a dependency for completing the MVP.
+
+3. Required technical stack
+
+Use the tools and concepts I have learned in my coursework:
+
+Next.js with App Router.
+
+React functional components and hooks.
+
+JavaScript, not TypeScript.
+
+Node.js.
+
+Next.js API route handlers.
+
+Standard CSS or CSS Modules.
+
+Git and GitHub.
+
+Environment variables for API secrets.
+
+The AI API provider and key supplied by my instructor, if compatible with the project.
+
+Do not introduce a database, authentication, payment system, file uploads, or unnecessary external services.
+
+Do not use Python as the application's implementation language.
+
+Use the simplest architecture that demonstrates a real full-stack AI feature.
+
+4. AI API integration
+
+This project must call an actual AI API from the application's BACK END.
+
+Never call the AI provider directly from browser-side React code.
+
+Store the API key in a Git-ignored environment variable.
+
+Never put the API key in the front end, repository, logs, prompt history, or screenshots.
+
+Do not ask me to paste the API key into chat.
+
+Before writing API integration code, verify which provider, endpoint, model, and SDK are available through my instructor.
+
+MVP API strategy
+
+Use exactly one AI API request per completed interview.
+
+The user answers three predetermined questions.
+
+The back end sends the three question-and-answer pairs to the AI model in a single evaluation request.
+
+The AI returns one structured feedback response.
+
+This is intended to keep the number of calls, token consumption, cost, and failure points manageable.
+
+Do not add a second AI API call for formatting, repairing JSON, or generating decorative text.
+
+System prompt
+
+Create a dedicated server-side system prompt that:
+
+Defines the AI as a supportive, constructive mock interview coach.
+
+Uses a playful Dracula-inspired tone.
+
+Evaluates responses based only on the actual questions and answers.
+
+Does not invent qualifications, experiences, facts, or outcomes.
+
+Gives actionable, concise feedback.
+
+Does not make hiring or employability guarantees.
+
+Uses plain, encouraging language.
+
+Returns a predictable structured format.
+
+Acknowledges uncertainty when answers provide insufficient information.
+
+I want to understand exactly where this system prompt lives in the code and how changing it changes the model's behavior.
+
+5. Token management and cost control
+
+Token management is a central learning objective.
+
+Implement:
+
+A server-side maximum length for each answer.
+
+A maximum output-token setting, using the provider's supported parameter.
+
+Only the information required to evaluate the interview.
+
+A small, cost-efficient AI model compatible with the instructor's credentials.
+
+Tracking of actual input and output token usage when the provider exposes that information.
+
+A way to calculate an estimated cost per interview and per 1,000 interviews.
+
+Use actual provider pricing verified at implementation time. Never invent pricing.
+
+Explain whether token usage should appear in a small optional developer/debug panel or server-side development log.
+
+Do not expose secrets or sensitive answer content in logs.
+
+Do not call the API automatically when users switch questions, edit text, navigate, or refresh.
+
+Only make the evaluation call when the user intentionally submits the completed interview.
+
+Prevent accidental duplicate submissions.
+
+6. Guardrails and reliability
+
+I struggle with these concepts, so this section is especially important.
+
+I need to understand and demonstrate three different types of protection.
+
+Guardrail A: Input validation
+
+Before making an API call:
+
+Reject empty or whitespace-only answers.
+
+Enforce reasonable answer length limits.
+
+Validate the expected number of questions and answers.
+
+Validate the selected interview category.
+
+Reject malformed request data.
+
+Treat user answers as untrusted content, not instructions.
+
+Explain how each check protects reliability and/or limits cost.
+
+Guardrail B: Output validation
+
+Before displaying AI feedback:
+
+Verify the response exists.
+
+Validate the expected structured output fields.
+
+Check required fields and expected types.
+
+Reject empty or malformed feedback.
+
+Avoid displaying invented scoring claims or unsupported conclusions.
+
+Display a useful fallback if the output is unusable.
+
+Use the provider's supported structured-output feature if appropriate, plus application-side validation.
+
+Never assume the AI returns perfectly formatted information just because the prompt requests it.
+
+Guardrail C: API failure handling
+
+Implement safe handling for:
+
+API errors.
+
+Rate-limit errors (HTTP 429).
+
+Timeouts.
+
+Network failures.
+
+Invalid AI responses.
+
+Use appropriate try/catch handling.
+
+Show friendly, useful error messages rather than raw technical errors.
+
+Ensure users' previously entered answers remain available so they can retry.
+
+Prevent unlimited automatic retries. For MVP, favor a deliberate manual retry.
+
+Required reliability tests
+
+I want to test each guardrail deliberately.
+
+Create tests for:
+
+Empty answer.
+
+Whitespace-only answer.
+
+Excessively long answer.
+
+Missing question or answer.
+
+Malformed server request.
+
+Simulated HTTP 429 error.
+
+Simulated AI timeout.
+
+Simulated invalid or empty AI response.
+
+Successful normal interview.
+
+Attempted duplicate submission.
+
+Tests for expected failures should not require spending real API tokens. Use mocked responses or simulated errors where appropriate.
+
+Explain the expected result of each test and what passing it proves.
+
+7. Week 6 course compliance
+
+The final application must demonstrate:
+
+Day 1 — Calling an AI API
+
+Secure server-side AI integration.
+
+System prompt in code.
+
+API result displayed in the interface.
+
+Understanding of the full request/response flow.
+
+Day 2 — Tokens, cost, and rate limits
+
+Token usage awareness and measurement.
+
+Realistic cost estimate.
+
+Input/output caps.
+
+Graceful rate-limit handling.
+
+Day 3 — Guardrails and reliability
+
+Input validation.
+
+Output validation.
+
+API-error and timeout handling.
+
+Deliberate failure testing.
+
+Day 4 — Controlled build
+
+Working application.
+
+Reviewed code changes.
+
+Small Git commits.
+
+Prompt log.
+
+No exposed secrets.
+
+Demonstration-ready feature.
+
+8. Prompt Log
+
+At the beginning of implementation, help me create:
+
+PROMPT_LOG.md
+
+It should document each development step with:
+
+Step number and objective.
+
+My prompt to Claude Code.
+
+Files changed.
+
+Why those changes were made.
+
+Important code concepts learned.
+
+How I tested the change.
+
+Test results.
+
+Problems or errors encountered.
+
+Claude mistakes I identified.
+
+Corrections made.
+
+Git commit message and hash after I commit.
+
+Do not invent tests, mistakes, or results.
+
+Help me write entries as we actually complete work.
+
+9. Git and GitHub workflow
+
+I want to perform Git commits myself.
+
+Do not automatically commit or push code unless I explicitly request that action.
+
+After each completed, verified milestone:
+
+Explain the files that changed.
+
+Walk me through the important code.
+
+Show me how to review the Git diff.
+
+Give me the appropriate Git commands.
+
+Tell me how to verify that no secret files are tracked.
+
+Suggest a short, descriptive commit message.
+
+Let me perform the commit myself.
+
+Do not move to the next development step until I confirm the current step works.
+
+10. Teaching and collaboration style
+
+I learn best through small, sequential steps.
+
+Follow this process:
+
+Explain → Implement one small change → Review → Test → Confirm → Commit → Log → Next step.
+
+Never make large batches of changes across many unrelated files.
+
+Do not silently fix unrelated issues.
+
+Do not add features merely because they seem useful.
+
+When introducing an unfamiliar concept, explain it in plain English with an example from this application.
+
+Whenever possible, explain:
+
+What runs in the browser.
+
+What runs on the server.
+
+Where the AI API is called.
+
+What data is sent.
+
+What data is returned.
+
+What could fail.
+
+How we verify it works.
+
+I want to be able to explain the application myself at demo day.
+
+11. Time and scope
+
+This is a two-day MVP build.
+
+Prioritize completing the core course requirements over additional features.
+
+MVP requirements:
+
+Functional Dracula interview.
+
+Three interview questions.
+
+One AI feedback request.
+
+Modern Halloween interface.
+
+Secure API key.
+
+System prompt.
+
+Token and cost management.
+
+Three categories of guardrails.
+
+Working error handling.
+
+Reliability tests.
+
+GitHub repository.
+
+Prompt Log.
+
+Future features, NOT required for MVP:
+
+Additional playable monsters.
+
+AI-generated interview questions.
+
+Voice conversations.
+
+Animated character lip-sync.
+
+User accounts.
+
+Saved interview history.
+
+Resume analysis.
+
+Real job matching.
+
+Database integration.
+
+12. Your task right now: PLAN ONLY
+
+Before we implement anything:
+
+Inspect the current working directory only after confirming which folder or repository I want to use.
+
+Recommend a simple Next.js/React/JavaScript project architecture.
+
+Identify the minimum pages, components, and API routes required.
+
+Explain the data flow from user input to the AI API and back.
+
+Propose a strict AI request/token budget.
+
+Explain the system prompt and response format.
+
+Identify the guardrails and how to test them.
+
+Propose a two-day build sequence broken into small, individually testable milestones.
+
+Identify the most likely technical risks or scope problems.
+
+Provide an MVP acceptance checklist mapped to all Week 6 requirements.
+
+For each milestone, describe:
+
+What we will build.
+
+Which files will change.
+
+What I will learn.
+
+How we will test it.
+
+What I should check before committing.
+
+Do not implement anything yet.
+
+Present your proposed plan and stop so I can review and approve it before we begin Step 1.
+```
+
+</details>
+
+- **Files changed:** none (plan saved outside the repo by Claude Code).
+- **Why:** Avoid building everything in one pass; understand each piece first.
+- **Decisions made:** OpenAI is the provider (my own key). Model: `gpt-4.1-nano`, chosen because it is cheap and non-reasoning, so output tokens are predictable. May revisit later.
+- **Verified from OpenAI docs (pricing page shows no date):** `gpt-4.1-nano` is $0.10 per 1M input tokens and $0.40 per 1M output tokens (Standard tier). Re-check before the cost step.
+
+---
+
+## Step 1 — Project setup
+- **Objective:** Create the Next.js app (JavaScript, App Router, no Tailwind/TypeScript), install the `openai` SDK, protect secrets with `.gitignore`, add `.env.example`, start this log.
+- **My prompt:** "Continue with the recommendation of gpt-4.1-nano and adjust later if we think its better."
+- **Files changed:** `package.json`, `package-lock.json`, `app/*`, `public/*`, `jsconfig.json`, `next.config.mjs`, `README.md`, `AGENTS.md`, `.gitignore` (added `!.env.example` after `.env*`), `.env.example`, `PROMPT_LOG.md`.
+- **Why:** `.env*` is ignored so a real key can't be committed; `!.env.example` lets the placeholder template be committed.
+- **Concepts learned:** (fill in after reviewing) env vars, `.gitignore` negation, why no `NEXT_PUBLIC_` prefix for secrets.
+- **How I tested:** `git check-ignore -v .env.local .env.example` (run by Claude: `.env.local` ignored by line 34, `.env.example` re-included by line 35). `npm run dev` — (I run this: result ____).
+- **Problems / errors:** `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed.
+- **Claude mistakes I identified:** (fill in only if I find any)
+- **Corrections made:**
+- **Git commit message:**
+- **Commit hash:**
