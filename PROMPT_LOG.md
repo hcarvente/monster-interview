@@ -639,10 +639,22 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **My prompt:** "Continue with the recommendation of gpt-4.1-nano and adjust later if we think its better."
 - **Files changed:** `package.json`, `package-lock.json`, `app/*`, `public/*`, `jsconfig.json`, `next.config.mjs`, `README.md`, `AGENTS.md`, `.gitignore` (added `!.env.example` after `.env*`), `.env.example`, `PROMPT_LOG.md`.
 - **Why:** `.env*` is ignored so a real key can't be committed; `!.env.example` lets the placeholder template be committed.
-- **Concepts learned:** (fill in after reviewing) env vars, `.gitignore` negation, why no `NEXT_PUBLIC_` prefix for secrets.
-- **How I tested:** `git check-ignore -v .env.local .env.example` (run by Claude: `.env.local` ignored by line 34, `.env.example` re-included by line 35). `npm run dev` — (I run this: result ____).
-- **Problems / errors:** `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed.
+- **Concepts learned:**
+  - Staging: `git add` moves changes into a waiting area; `git commit` snapshots only what is staged.
+  - `.env*` in `.gitignore` hides secret files; `!.env.example` re-includes the placeholder template.
+  - Env vars without a `NEXT_PUBLIC_` prefix stay on the server; with it, Next.js ships them to the browser.
+  - `git ls-files` lists only tracked/staged files, so it shows nothing before `git add`.
+  - `grep` exits with status 1 when nothing matches, which VS Code shows as a red dot (not a real error).
+- **How I tested:**
+  - Claude ran `git check-ignore -v .env.local .env.example`: `.env.local` matched the ignore rule (`.gitignore` line 34); `.env.example` matched the exception (line 35), so it is not ignored.
+  - I ran `git add .` then `git ls-files | grep -i env`.
+  - `npm run dev` and opening http://localhost:3000: ____ (fill in what you saw)
+- **Test results:** `git ls-files | grep -i env` listed only `.env.example`, so no secret file is tracked. Dev server result: ____
+- **Problems / errors:**
+  - `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed.
+  - A `.git` folder already existed (likely left by the failed first `create-next-app` run). It had no commits, so it was harmless.
+  - I first ran `git ls-files | grep -i env` before `git add .`, saw only a red dot and no output. Cause: nothing was staged yet, so there was nothing to list. After `git add .` it worked.
 - **Claude mistakes I identified:** (fill in only if I find any)
 - **Corrections made:**
-- **Git commit message:**
-- **Commit hash:**
+- **Git commit message:** Set up Next.js app, openai SDK, and env safety
+- **Commit hash:** f499427
