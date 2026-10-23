@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Landing from "@/components/Landing";
+import SetupScreen from "@/components/SetupScreen";
+import { getCharacter } from "@/lib/characters";
 
-// One page, one "screen" state: later steps add setup, interview, results.
+// One page, one "screen" state: later steps add interview and results.
 export default function Home() {
   const [screen, setScreen] = useState("landing");
   const [characterId, setCharacterId] = useState(null);
+  const [categoryId, setCategoryId] = useState(null);
 
   function handleEnter(id) {
     setCharacterId(id);
@@ -17,11 +20,23 @@ export default function Home() {
     return <Landing onEnter={handleEnter} />;
   }
 
-  // Placeholder until Step 4 builds the setup screen.
+  if (screen === "setup") {
+    return (
+      <SetupScreen
+        character={getCharacter(characterId)}
+        categoryId={categoryId}
+        onSelectCategory={setCategoryId}
+        onStart={() => setScreen("interview")}
+        onBack={() => setScreen("landing")}
+      />
+    );
+  }
+
+  // Placeholder until Step 4b builds the interview screen.
   return (
     <main style={{ padding: 32 }}>
-      <p>Setup screen coming in Step 4 (character: {characterId}).</p>
-      <button onClick={() => setScreen("landing")}>Back</button>
+      <p>Interview screen coming in Step 4b (category: {categoryId}).</p>
+      <button onClick={() => setScreen("setup")}>Back</button>
     </main>
   );
 }

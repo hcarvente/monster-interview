@@ -699,3 +699,22 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add landing screen and character selection
 - **Commit hash:** 7c2335a
+
+---
+
+## Step 4a — Setup screen
+- **Objective:** Build the setup screen where the user sees the chosen character, reads the 3-question explanation, and picks an interview category before starting.
+- **My prompt:** "Deal with repo, and I changed the folder name to monster-interview" / "yes commit and push, then start Step 4"
+- **Files changed:** `components/SetupScreen.js` + `.module.css` (new); `app/page.js` (added `categoryId` state and renders `SetupScreen`; interview screen still a placeholder); `PROMPT_LOG.md`.
+- **Why:**
+  - `categoryId` lives in `page.js` (lifted state) so the choice survives Back and carries into the interview in Step 4b.
+  - Category options are `role="radio"` inside a `radiogroup` with `aria-checked`, so assistive tech reads them as one single-choice group.
+  - Start Interview is `disabled` until a category is picked, with a hint under it.
+- **Concepts learned:** Lifting state up; controlled selection via props and callbacks; ARIA radio group; disabled buttons as simple validation feedback.
+- **How I tested:** `npm run dev` at http://localhost:3000. Claude also ran `next build`, which compiled successfully.
+- **Test results:** Per me: all components worked. I went through each of the three categories back and forth, and picking a category and the Start Interview button worked. I did not report checking the keyboard focus ring or the 375px width for this screen.
+- **Problems / errors:** None reported.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:**
+- **Commit hash:**
