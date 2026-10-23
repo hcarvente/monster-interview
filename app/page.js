@@ -33,6 +33,8 @@ export default function Home() {
   const [feedback, setFeedback] = useState(null);
   // The friendly message shown on the error screen.
   const [errorMessage, setErrorMessage] = useState("");
+  // After a rate limit, how many seconds the server asked us to wait (0 = no wait).
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
   // Duplicate-submit lock. A ref (not state) because it changes instantly:
   // state updates are applied later, so a fast second click could slip through.
   const isSubmitting = useRef(false);
@@ -108,12 +110,16 @@ export default function Home() {
 
       if (!response.ok) {
         // Show the server's friendly message when there is one.
-        throw new Error(
+        const failure = new Error(
           data?.error?.message ?? "Something went wrong. Please try again."
         );
+        // Carry the server's "please wait N seconds" along (only sent for rate limits).
+        failure.retryAfterSeconds = data?.error?.retryAfterSeconds ?? 0;
+        throw failure;
       }
 
       setFeedback(data.feedback);
+      setRetryAfterSeconds(0);
       setScreen("results");
     } catch (error) {
       // fetch itself throws a TypeError when the network is down. Show a friendly
@@ -124,6 +130,7 @@ export default function Home() {
           ? "Could not reach the server. Check your connection and try again."
           : error.message
       );
+      setRetryAfterSeconds(error.retryAfterSeconds ?? 0);
       setScreen("error");
     } finally {
       // Always unlock, success or failure, so a deliberate retry is possible.
@@ -181,6 +188,7 @@ export default function Home() {
     return (
       <ErrorBanner
         message={errorMessage}
+        cooldownSeconds={retryAfterSeconds}
         onRetry={submitInterview}
         onBack={() => {
           setQuestionIndex(QUESTIONS_PER_INTERVIEW - 1);

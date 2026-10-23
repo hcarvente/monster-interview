@@ -75,6 +75,13 @@
   box-shadow: 0 0 24px rgba(255, 122, 26, 0.4);
 }
 
+/* Disabled during the rate-limit cooldown: faded, no glow. */
+.retry:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* Keyboard focus outline for both buttons. */
 .back:focus-visible,
 .retry:focus-visible {
