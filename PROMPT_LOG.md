@@ -961,3 +961,24 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add README with architecture, guardrails, cost and demo script
 - **Commit hash:** 1b54d01
+
+---
+
+## Step 11 (extra, after the MVP was complete) — Haunted house landing backdrop
+- **Objective:** Give the landing page a scary-but-playful background without adding image files or slowing the app.
+- **My prompt:** "would it be too much to add a back ground on like a scary building to the landing page?" / "Do it now, and then the demo script" / "Yes commit the haunted house."
+- **Files changed:** `components/HauntedScene.js` + `.module.css` (new); `components/Landing.js` (renders the scene first); `components/Landing.module.css` (`position: relative; isolation: isolate`).
+- **Why:**
+  - Drawn as inline SVG and CSS, so there is no image file and no image-generation dependency, and it scales with the screen.
+  - Fixed to the bottom of the viewport at most 70% of its height, so the title area keeps a plain background. The silhouettes are only slightly lighter than the page background so text stays readable.
+  - `aria-hidden` and `pointer-events: none`, so it cannot confuse a screen reader or block a click.
+  - Window flicker and drifting bats run only when the user has not asked for reduced motion.
+  - `isolation: isolate` on the landing screen makes `z-index: -1` mean "behind this screen's content, in front of the page background".
+- **Concepts learned:** inline SVG and `viewBox` / `preserveAspectRatio`; stacking contexts and `z-index`; decorative content and `aria-hidden`; `prefers-reduced-motion`.
+- **How I tested:** Claude ran `next build` (compiled) and `npm test` (73 of 73 passed). I looked at the landing page in the browser.
+- **Test results:** I approved the look and asked for it to be committed. I did not report separate results for readability near the cards, the 375px width, or keyboard focus on this screen.
+- **Problems / errors:** None reported.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add haunted house backdrop to landing screen
+- **Commit hash:** e0440a1
