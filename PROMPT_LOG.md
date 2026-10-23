@@ -678,3 +678,23 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:**
 - **Commit hash:**
+
+---
+
+## Step 3 — Landing + character select
+- **Objective:** Build the landing screen with branding, tagline, character cards (Dracula playable, other two "coming soon"), and an "Enter the Interview" button.
+- **My prompt:** "We're on the Monster Interview project. Read PROMPT_LOG.md and that plan file, then start Step 3. And help me connect this to the git hub repo"
+- **Files changed:** `components/MonsterAvatar.js` + `.module.css`, `components/CharacterCard.js` + `.module.css`, `components/Landing.js` + `.module.css` (all new); `app/page.js` (replaced template with a `screen` state); `app/layout.js` (title/description); `app/page.module.css` (deleted, unused template CSS); `PROMPT_LOG.md`.
+- **Why:**
+  - `MonsterAvatar`: emoji on a glowing orb, so no image files are needed for the MVP.
+  - `CharacterCard`: a real `<button>`; unavailable characters are `disabled` with a "Coming soon" badge; `aria-pressed` marks the selected card.
+  - `Landing`: client component because it holds the selected-character state; calls `onEnter(characterId)` when the button is clicked.
+  - `app/page.js`: holds `screen` state so later steps can add setup, interview and results screens.
+- **Concepts learned:** Server vs Client Components (`"use client"` is needed for `useState` and click handlers); CSS Modules (class names scoped per component); passing data up with callback props (`onEnter`, `onSelect`); `disabled` buttons and `aria-pressed`.
+- **How I tested:** `npm run dev` at http://localhost:3000; clicked Dracula and Enter the Interview; narrowed the window to 375px; tried clicking the coming-soon cards. Claude also ran `next build`, which compiled successfully.
+- **Test results:** Page opened on localhost. The Dracula card worked and let me into the next (placeholder) page. Cards stacked at 375px. The coming-soon cards were unclickable.
+- **Problems / errors:** None so far. Keyboard focus ring was not reported as checked.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:**
+- **Commit hash:**
