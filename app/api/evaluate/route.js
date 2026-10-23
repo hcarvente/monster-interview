@@ -7,6 +7,7 @@
 import { validateRequest } from "@/lib/validateRequest";
 import { SYSTEM_PROMPT, FEEDBACK_SCHEMA, buildUserMessage } from "@/lib/prompts";
 import { evaluateInterview } from "@/lib/aiClient";
+import { parseAndValidateFeedback } from "@/lib/validateFeedback";
 
 // Fingerprints of requests being processed right now. If an identical request
 // arrives while one is in flight (e.g. a double-click or a script), we reject it.
@@ -60,16 +61,27 @@ export async function POST(request) {
       schema: FEEDBACK_SCHEMA,
     });
 
-    // 6. TEMPORARY: parse the AI's JSON text. Step 7 replaces this with full
-    //    output validation (Guardrail B), so for now this trusts the AI too much.
-    const feedback = JSON.parse(text);
+    // 6. GUARDRAIL B: never show the AI's reply without checking it. This parses
+    //    the JSON text and verifies fields, types, sizes and "no scores / no
+    //    hiring claims". An unusable reply becomes a friendly error, not a broken page.
+    const checked = parseAndValidateFeedback(text);
 
     // Log token COUNTS only. Never log the answers or the key.
     console.log(
       `[evaluate] tokens in=${usage.inputTokens} out=${usage.outputTokens} thought=${usage.thoughtTokens}`
     );
 
-    return Response.json({ feedback, usage });
+    if (!checked.ok) {
+      // The reason is for developers (logged), never shown to the user.
+      console.error(`[evaluate] invalid AI output: ${checked.reason}`);
+      return errorResponse(
+        502,
+        "INVALID_OUTPUT",
+        "The Count's reply got scrambled in the mist. Please try again."
+      );
+    }
+
+    return Response.json({ feedback: checked.value, usage });
   } catch (error) {
     // TEMPORARY catch-all. Step 7 maps specific failures (429, timeout, bad
     // output) to specific friendly messages. Log only the error's name/code/status,
