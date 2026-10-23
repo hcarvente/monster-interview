@@ -865,3 +865,23 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add AI output validation (Guardrail B) with tests
 - **Commit hash:** 382e25e
+
+---
+
+## Step 9 (built early) — Results screen
+- **Objective:** Replace the plain-text placeholder with a visual results screen. Built before Step 7b because the demo is tomorrow and I asked for a friendlier look.
+- **My prompt:** "I wonder if the my fate reply can also have a more visually friendly look. Rather than just some text in the upper left." / "yes start the results screen"
+- **Files changed:** `components/ResultsScreen.js` + `.module.css` (new); `app/page.js` (renders `ResultsScreen`, adds `handleRestart`, a fallback to the landing screen if there is no feedback); `app/globals.css` (new `--good` green).
+- **Why:**
+  - The screen only displays data. It relies on Guardrail B (Step 7a) having validated every field, so it needs no defensive checks of its own.
+  - Layout: avatar and glowing title, a highlighted overall card, "What worked" (green) and "Sharpen your fangs" (orange) cards side by side or stacked, the improved answer as a quote with its question, a "practice, not a real hiring decision" note, and Back to my answers / Play again buttons.
+  - Entrance animation is staggered by a per-block `--i` value and is skipped when the user prefers reduced motion. The title takes keyboard focus when the screen appears.
+  - "Play again" clears character, category, answers, question index, feedback and error text.
+- **Concepts learned:** Props-only display components; `useRef` + `useEffect` for focus; CSS custom properties set inline for staggered animation; `prefers-reduced-motion`; why validating the data first makes the UI simpler.
+- **How I tested:** `npm run dev`, a full interview with the real AI, at normal width and at 375px.
+- **Test results:** Per me: the feedback cards work; the 375px screen worked; Back to my answers and Play again worked; the keyboard focus ring works. I also noticed the feedback is different each time I run the same answers (expected: the model's wording varies between runs; the structure is enforced by the validator).
+- **Problems / errors:** None reported. Claude noticed and cleaned up one redundant CSS rule before commit.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add results screen with feedback cards and play again
+- **Commit hash:** 5c97b98
