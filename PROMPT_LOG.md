@@ -797,15 +797,48 @@ Present your proposed plan and stop so I can review and approve it before we beg
 
 ---
 
-## Step 6 (in progress) — Provider change: OpenAI to Gemini
+## Step 6 — Gemini provider, model, system prompt and first real call
 - **Objective:** Pick the AI provider and model for the real API call.
 - **My prompt:** "Okay, am I supposed to get the key now?" / "I dont have credit on the billing page. So what do I do ?" / "Can I instead use a gemini api key which can be free?" / "Yes, go with Gemini 2.5 Flash-Lite"
-- **Decision:** Switched from OpenAI (`gpt-4.1-nano`, Step 0) to Google Gemini, model Gemini 2.5 Flash-Lite, because I had no OpenAI credit and Gemini has a free tier. Whether my instructor approved Gemini is not recorded here yet (blank until I confirm).
+- **Decision:** Switched from OpenAI (`gpt-4.1-nano`, Step 0) to Google Gemini, first planned as Gemini 2.5 Flash-Lite (later changed to `gemini-3.5-flash-lite`, see below), because I had no OpenAI credit and Gemini has a free tier. My instructor approved using Gemini.
 - **Verified from Google's docs (pricing page marked "Last updated 2026-10-22"):** Gemini 2.5 Flash-Lite paid-tier price is $0.10 per 1M input tokens and $0.40 per 1M output tokens (same as `gpt-4.1-nano`); free tier exists. Free-tier content may be used to improve Google's products and reviewed by humans, and the terms say not to submit sensitive, confidential or personal information; paid-tier content is not used that way. Key is created in Google AI Studio; the SDK reads `GEMINI_API_KEY`.
 - **Verified from the installed SDK's type definitions (`@google/genai` 2.31.0):** the `interactions` API fields `system_instruction`, `max_output_tokens`, `response_format`, `output_text`, and usage fields `total_input_tokens` and `total_thought_tokens` exist.
-- **Not yet confirmed:** the exact model id string (expected `gemini-2.5-flash-lite`); whether thinking tokens count against `max_output_tokens` or are billed as output; whether the free tier needs a credit card; my actual rate limits.
+- **Resolved later in this step:** the free tier did not stop me (I was on the free tier and the key worked); thinking tokens were 0 on both tested models. Still unknown: my actual rate limits.
 - **Files changed:** `package.json` and `package-lock.json` (removed `openai`, added `@google/genai`); `.env.example` (`GEMINI_API_KEY`, `GEMINI_MODEL`); `PROMPT_LOG.md`.
 - **Problems / errors:** npm skipped the `protobufjs` postinstall script (a transitive dependency of the new SDK) with an `install-scripts` warning. Not yet checked whether anything depends on it.
+- **Git commit message:**
+- **Commit hash:**
+
+### Step 6a — System prompt (commit 90b80c2)
+- **Files:** `lib/prompts.js` (`SYSTEM_PROMPT`, `buildUserMessage`), `tests/prompts.test.js`.
+- **Why:** Rules live in one fixed system message; the user's answers go only in the user message, inside `<answer n="...">` tags with `<` and `>` escaped so an answer cannot close its own tag. After I asked whether more rules would help, Claude proposed and I approved extra rules (length caps per field, bracketed placeholders, nonsense answers, sensitive topics, do not reveal instructions, English only, limited Dracula puns).
+- **Concepts learned:** system vs user message; prompt injection is not stopped by input validation, only contained by the prompt design and output validation; every prompt word is sent on every request.
+- **Test results:** Per me: `npm test` passed. Prompt size about 536 tokens (rough estimate), later measured as 701 input tokens including the sample interview.
+- **Git commit message:** Add system prompt and user message builder with tests
+
+### Step 6b — Gemini client and first real call (commit hash below)
+- **Objective:** Call the real AI from the server, once, and see what comes back.
+- **My prompt:** "Key is saved, check it, and the billing tier is currently on free tier" / "run the script first as a quick check" / "Yes, go with gemini-3.5-flash-lite"
+- **Files changed:** `lib/aiClient.js` (new), `lib/prompts.js` (added `FEEDBACK_SCHEMA`), `app/api/evaluate/route.js` (mock replaced by the real call), `tests/aiClient.test.js` (new), `.env.example`.
+- **Why:**
+  - `aiClient.js` is the only file that talks to the provider. It sets a 700-token output cap, a 20-second timeout and `maxRetries: 0` (no hidden automatic retries), and rejects any response whose status is not `completed` or whose text is empty.
+  - Claude confirmed `maxRetries: 0` works by pointing the real SDK at a local fake server that always returned 429: it received exactly 1 request and threw a `RateLimitError` with `status: 429`.
+  - The route logs token counts only, never answers or the key. Two shortcuts are marked TEMPORARY and replaced in Step 7: a plain `JSON.parse` with no output validation, and one generic error message.
+- **How I tested:**
+  - `npm test` (29 tests; the AI tests use a fake client, so no tokens).
+  - Claude checked my `.env.local` for variable names, value presence and length only (never the values); both variables were present with no quotes or spaces, and the file is git-ignored.
+  - Claude ran one real-call script with made-up answers (no personal details), using the key from `.env.local`.
+- **Test results:**
+  - `gemini-2.5-flash-lite` failed with HTTP 404: "no longer available to new users". The pricing page still listed it.
+  - `gemini-3.5-flash-lite`: worked, 701 input / 285 output / 0 thinking tokens, 2.5 s, 3 strengths, 2 improvements, improved answer 76 words, valid JSON matching the schema.
+  - `gemini-3.1-flash-lite`: worked, 701 / 321 / 0, 3.3 s, 2 strengths, 3 improvements, improved answer 106 words, and it added claims the user never made ("passion for front-end development", "managing the state"). One sample each, so only an impression.
+  - Chosen: `gemini-3.5-flash-lite` (follows the "use only the user's facts" rule better; paid-tier list price $0.30 in / $2.50 out per 1M tokens, about $0.0009 per typical interview by Claude's arithmetic; I am on the free tier so real spend is $0).
+  - Browser test of the full flow with the real AI: not yet done.
+- **Problems / errors:**
+  - The model id from the docs (`gemini-2.5-flash-lite`) did not work for my new account, while Google's pricing page still listed it. Lesson: docs and the live API can disagree; keep the model id in an env var (`GEMINI_MODEL`).
+  - My `.env.local` still has `GEMINI_MODEL=gemini-2.5-flash-lite` until I change it myself to `gemini-3.5-flash-lite` and restart `npm run dev`.
+- **Claude mistakes I identified:** Claude put `gemini-2.5-flash-lite` in the code, `.env.example` and the plan as the model, based on the docs, and it did not work for my account. (Logged by Claude from the session; confirm or edit.)
+- **Corrections made:** Changed the model to `gemini-3.5-flash-lite` in `.env.example` and the default in `aiClient.js`.
 - **Git commit message:**
 - **Commit hash:**
 

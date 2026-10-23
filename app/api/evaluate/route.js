@@ -2,19 +2,17 @@
 // A Route Handler: Next.js calls the exported POST function whenever the browser
 // sends a POST request to /api/evaluate (the folder path becomes the URL).
 //
-// STEP 5b: this returns a hard-coded MOCK response. No AI is called yet.
-// The real AI call arrives in Step 6, and will live right where the mock is.
+// This is where the whole back-end flow happens, in order:
+//   validate input -> block duplicates -> build prompt -> ONE AI call -> reply.
 import { validateRequest } from "@/lib/validateRequest";
+import { SYSTEM_PROMPT, FEEDBACK_SCHEMA, buildUserMessage } from "@/lib/prompts";
+import { evaluateInterview } from "@/lib/aiClient";
 
 // Fingerprints of requests being processed right now. If an identical request
 // arrives while one is in flight (e.g. a double-click or a script), we reject it.
 // This lives in this server process's memory, which is fine for the MVP but would
 // not be shared across multiple server instances.
 const inFlight = new Set();
-
-// A short fake "thinking" delay so we can SEE the loading state and test the
-// duplicate guard. Removed in Step 6 when the real AI call takes its place.
-const MOCK_DELAY_MS = 1500;
 
 // Small helper so every error response has the same shape:
 // { error: { code, message } } plus the right HTTP status number.
@@ -51,27 +49,41 @@ export async function POST(request) {
   inFlight.add(key);
 
   try {
-    // 4. MOCK: wait a moment, then return fixed feedback in the same shape the
-    //    real AI result will have (Step 6). `usage` stays null until we have real
-    //    token counts (Step 8).
-    await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY_MS));
+    // 4. Build the two messages: our fixed rules, and the (escaped) interview data.
+    const userMessage = buildUserMessage(result.value.categoryId, result.value.answers);
 
-    return Response.json({
-      feedback: {
-        title: "The Count Has Spoken (mock result)",
-        overall:
-          "This is placeholder feedback from the mock server. No AI was called.",
-        strengths: ["Mock strength one", "Mock strength two"],
-        improvements: ["Mock improvement one", "Mock improvement two"],
-        improvedAnswer: {
-          questionNumber: 1,
-          text: "Mock improved answer. Real feedback arrives in Step 6.",
-        },
-      },
-      usage: null,
+    // 5. THE ONE AI CALL for this interview. It happens only here, on the server,
+    //    and only because the user clicked "Reveal My Fate".
+    const { text, usage } = await evaluateInterview({
+      systemPrompt: SYSTEM_PROMPT,
+      userMessage,
+      schema: FEEDBACK_SCHEMA,
     });
+
+    // 6. TEMPORARY: parse the AI's JSON text. Step 7 replaces this with full
+    //    output validation (Guardrail B), so for now this trusts the AI too much.
+    const feedback = JSON.parse(text);
+
+    // Log token COUNTS only. Never log the answers or the key.
+    console.log(
+      `[evaluate] tokens in=${usage.inputTokens} out=${usage.outputTokens} thought=${usage.thoughtTokens}`
+    );
+
+    return Response.json({ feedback, usage });
+  } catch (error) {
+    // TEMPORARY catch-all. Step 7 maps specific failures (429, timeout, bad
+    // output) to specific friendly messages. Log only the error's name/code/status,
+    // never its full text, which could echo request content.
+    console.error(
+      `[evaluate] failed: ${error?.name} code=${error?.code ?? ""} status=${error?.status ?? ""}`
+    );
+    return errorResponse(
+      502,
+      "AI_ERROR",
+      "The monsters' crystal ball is cloudy. Please try again."
+    );
   } finally {
-    // 5. Always free the fingerprint, even if something above threw, otherwise
+    // 7. Always free the fingerprint, even if something above threw, otherwise
     //    this interview could never be submitted again.
     inFlight.delete(key);
   }
