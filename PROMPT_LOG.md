@@ -794,3 +794,18 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:** Switched the test to DevTools Offline.
 - **Git commit message:** Add mock evaluate API route and submit flow with loading and error states
 - **Commit hash:** 5d2d62c
+
+---
+
+## Step 6 (in progress) — Provider change: OpenAI to Gemini
+- **Objective:** Pick the AI provider and model for the real API call.
+- **My prompt:** "Okay, am I supposed to get the key now?" / "I dont have credit on the billing page. So what do I do ?" / "Can I instead use a gemini api key which can be free?" / "Yes, go with Gemini 2.5 Flash-Lite"
+- **Decision:** Switched from OpenAI (`gpt-4.1-nano`, Step 0) to Google Gemini, model Gemini 2.5 Flash-Lite, because I had no OpenAI credit and Gemini has a free tier. Whether my instructor approved Gemini is not recorded here yet (blank until I confirm).
+- **Verified from Google's docs (pricing page marked "Last updated 2026-10-22"):** Gemini 2.5 Flash-Lite paid-tier price is $0.10 per 1M input tokens and $0.40 per 1M output tokens (same as `gpt-4.1-nano`); free tier exists. Free-tier content may be used to improve Google's products and reviewed by humans, and the terms say not to submit sensitive, confidential or personal information; paid-tier content is not used that way. Key is created in Google AI Studio; the SDK reads `GEMINI_API_KEY`.
+- **Verified from the installed SDK's type definitions (`@google/genai` 2.31.0):** the `interactions` API fields `system_instruction`, `max_output_tokens`, `response_format`, `output_text`, and usage fields `total_input_tokens` and `total_thought_tokens` exist.
+- **Not yet confirmed:** the exact model id string (expected `gemini-2.5-flash-lite`); whether thinking tokens count against `max_output_tokens` or are billed as output; whether the free tier needs a credit card; my actual rate limits.
+- **Files changed:** `package.json` and `package-lock.json` (removed `openai`, added `@google/genai`); `.env.example` (`GEMINI_API_KEY`, `GEMINI_MODEL`); `PROMPT_LOG.md`.
+- **Problems / errors:** npm skipped the `protobufjs` postinstall script (a transitive dependency of the new SDK) with an `install-scripts` warning. Not yet checked whether anything depends on it.
+- **Git commit message:**
+- **Commit hash:**
+
