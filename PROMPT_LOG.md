@@ -915,3 +915,30 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add API failure handling (Guardrail C), retry cooldown and simulated failures
 - **Commit hash:** d888c6b
+
+---
+
+## Step 8 — Tokens and cost
+- **Objective:** Turn real token counts into dollars, with a cost per interview and per 1,000, using verified prices, and log it on the server.
+- **My prompt:** "I agree, keep going" (including skipping the optional on-screen dev panel and using the server log instead).
+- **Files changed:** `lib/usage.js` (new), `scripts/cost-report.mjs` (new), `tests/usage.test.js` (new), `lib/aiClient.js` (also returns which model answered), `lib/evaluateHandler.js` (log line adds estimated cost), `tests/evaluateHandler.test.js` (2 new tests), `package.json` (`npm run cost`).
+- **Why:**
+  - Prices were re-checked on Google's pricing page (page marked "Last updated 2026-10-22", checked 2026-10-23): `gemini-3.5-flash-lite` is $0.30 per 1M input tokens and $2.50 per 1M output tokens, and the page says the output price includes thinking tokens. They are stored in `PRICING` in `lib/usage.js` with the source and dates.
+  - Thinking tokens are counted as output, as the page says they are billed that way. Both tested models used 0.
+  - If the token counts are missing, or the model is not the one we have prices for, the cost is `null` and nothing is logged, instead of a made-up number.
+  - Server log only (counts and estimated cost, never answers or the key). I chose not to build the on-screen dev panel.
+- **Concepts learned:** what a token is; input vs output pricing; cost per interview vs per 1,000; why a worst case uses the hard output cap; calibrating an estimate against a real measurement; free tier means real spend is $0 while the estimate uses paid list prices.
+- **How I tested:**
+  - `npm test`: 73 tests (12 new): known token counts give the exact expected dollars, thinking tokens count as output, missing counts or a different model give `null`, the worst case uses the output cap.
+  - `npm run cost` (no key, no tokens).
+  - Claude compared the "4 characters per token" estimate with a real run: it predicted 899 input tokens vs 844 measured, about 6% high.
+  - Me: one real interview in the browser.
+- **Test results:**
+  - `npm test`: 73 of 73 passed.
+  - `npm run cost`: measured sample (844 in, 346 out) $0.00112 per interview, $1.12 per 1,000; worst case (3 answers of 800 characters, output at the 700-token cap, input estimated at about 1,236) $0.00212 per interview, $2.12 per 1,000.
+  - My real interview (per me) printed in the terminal: `[evaluate] tokens in=825 out=340 thought=0 est.cost=$0.00110 (~$1.10 per 1,000)`. That is close to the earlier measured sample.
+- **Problems / errors:** The plan estimated about 1,100 input tokens; the worst case is now about 1,240 because we added rules to the system prompt. Still well within budget.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add token cost math, cost report script and cost logging
+- **Commit hash:** 8361402
