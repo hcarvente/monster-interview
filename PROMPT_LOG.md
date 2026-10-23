@@ -942,3 +942,22 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add token cost math, cost report script and cost logging
 - **Commit hash:** 8361402
+
+---
+
+## Step 10 — Final QA and demo prep
+- **Objective:** Check for exposed secrets, document the project, and map the work to the Week 6 requirements.
+- **My prompt:** "Terminal Prints: ... Yes commit and push. And then step 10"
+- **Files changed:** `README.md` (replaced the Next.js template text with how to run it, the architecture and data flow, where each file lives, the guardrails, token and cost numbers, how to test failures with `AI_MODE`, a demo script, and known limits); `PROMPT_LOG.md`.
+- **Why:** Demo day needs me to explain the app myself; the README is the script.
+- **How I tested / checked:**
+  - Secrets scan, run by Claude without printing the key: my real key value in all of Git history (every commit and branch): 0 matching lines; in currently tracked files: 0; the only env file ever committed is `.env.example`; no key-shaped strings (`AIza...`, `sk-...`) in tracked files; no `NEXT_PUBLIC_` variables; `.env.local` is ignored (`.gitignore` line 34); the key does not appear in the `.next` build output.
+  - Browser components import only `lib/questions.js` and `lib/characters.js` from `lib/`, so the prompt, the AI client and the key never reach the browser.
+  - Claude checked the README's Node requirement against the packages (`next` needs 20.9+ and the `--disable-warning` flag in `npm run cost` needs 20.11+), and fixed "Node 20+" to "Node 20.11 or newer".
+  - `npm test`: 73 of 73 passed. `next build`: compiled.
+- **Test results:** Secrets scan clean (above). Tests and build pass.
+- **Problems / errors:** None in this step. Not separately tested by me in the browser: the `slow` double-click mode, and the 375px width of the interview screen after the later changes.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add README with architecture, guardrails, cost and demo script
+- **Commit hash:** 1b54d01
