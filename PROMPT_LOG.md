@@ -651,7 +651,7 @@ Present your proposed plan and stop so I can review and approve it before we beg
   - `npm run dev` and opening http://localhost:3000.
 - **Test results:** `git ls-files | grep -i env` listed only `.env.example`, so no secret file is tracked. The dev server ran and showed the default Next.js page.
 - **Problems / errors:**
-  - `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed.
+  - `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed at that time. I later renamed the folder to `monster-interview` myself.
   - A `.git` folder already existed (likely left by the failed first `create-next-app` run). It had no commits, so it was harmless.
   - I first ran `git ls-files | grep -i env` before `git add .`, saw only a red dot and no output. Cause: nothing was staged yet, so there was nothing to list. After `git add .` it worked.
 - **Claude mistakes I identified:** (fill in only if I find any)
@@ -693,6 +693,7 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Concepts learned:** Server vs Client Components (`"use client"` is needed for `useState` and click handlers); CSS Modules (class names scoped per component); passing data up with callback props (`onEnter`, `onSelect`); `disabled` buttons and `aria-pressed`.
 - **How I tested:** `npm run dev` at http://localhost:3000; clicked Dracula and Enter the Interview; narrowed the window to 375px; tried clicking the coming-soon cards. Claude also ran `next build`, which compiled successfully.
 - **Test results:** Page opened on localhost. The Dracula card worked and let me into the next (placeholder) page. Cards stacked at 375px. The coming-soon cards were unclickable.
+- **GitHub connection:** `git remote -v` shows `origin` = `https://github.com/hcarvente/monster-interview.git`, and `main` tracks `origin/main`. Checked later: local `main` was 2 commits ahead of GitHub (the two log-only commits), so those still needed a push.
 - **Problems / errors:** None so far. Keyboard focus ring was not reported as checked.
 - **Claude mistakes I identified:**
 - **Corrections made:**
