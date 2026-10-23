@@ -885,3 +885,33 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Add results screen with feedback cards and play again
 - **Commit hash:** 5c97b98
+
+---
+
+## Step 7b — API failure handling (Guardrail C)
+- **Objective:** Turn every way the AI call can fail into a safe, friendly message, with no automatic retries and with my answers kept so I can retry deliberately. Add a way to test failures without spending tokens.
+- **My prompt:** "Commit and push and start the next step" (after the results screen).
+- **Files changed:** `lib/aiErrors.js` (new), `lib/evaluateHandler.js` (new), `lib/mockAi.js` (new), `tests/evaluateHandler.test.js` (new), `app/api/evaluate/route.js` (now a thin wrapper), `components/ErrorBanner.js` + `.module.css` (retry countdown), `app/page.js` (passes the server's wait time to the error screen).
+- **Why:**
+  - `aiErrors.js` sorts any error into a status, a code and a friendly message (429 rate limit, timeout, network, AI service 5xx, bad key or missing model, unexpected). It hides raw provider text and reads the `Retry-After` header, clamped to 5-120 seconds (default 30).
+  - Moving the flow into `evaluateHandler.js` with the AI call injected means tests can use a fake AI that fails on purpose, with no key and no tokens. `route.js` only connects Next.js to it.
+  - `mockAi.js` adds a dev-only `AI_MODE` setting (rate-limit, timeout, network, server-error, auth, bad-json, bad-output, score-claim, empty, slow, ok). `route.js` ignores it when `NODE_ENV` is `production`.
+  - After a 429 the Try again button is disabled with a countdown; retries are never automatic.
+  - Logs hold only the error's name, code and status, never answers or provider messages.
+- **Concepts learned:** dependency injection (passing the AI call in so it can be faked); recognizing errors by `status` and `name`; why rate-limit errors should include a wait time; `finally` to always release the duplicate lock; mutation checking (breaking a protection on purpose to prove a test catches it).
+- **How I tested:**
+  - `npm test`: 61 tests (18 new), covering empty, whitespace, over-long, missing and malformed input (AI called 0 times), 429 (one call, no retry), timeout, network, 5xx, setup problems, invalid AI output, duplicate submission, lock release after success and failure, and log safety. Every simulated `AI_MODE` is also run through the handler.
+  - Claude broke two protections on purpose (never releasing the duplicate lock, and logging the raw error message). A test failed each time, then Claude restored the code.
+  - Me, in the browser using `AI_MODE`: `rate-limit`, `bad-json`, `score-claim`.
+- **Test results:**
+  - `npm test`: 61 of 61 passed.
+  - `rate-limit` (per me): the error screen showed a countdown on Try again; the terminal logged `[evaluate] AI_MODE=rate-limit: SIMULATED, no real AI call` and `[evaluate] failed: RateLimitError code= status=429 -> RATE_LIMITED`.
+  - `bad-json` and `score-claim` (per me): both produced the expected results (the "scrambled in the mist" message and the matching invalid-output log lines).
+  - Not tried by me in the browser (covered by automated tests only): `timeout`, `network`, `server-error`, `auth`, `bad-output`, `empty`, `slow`/double-click.
+- **Problems / errors:**
+  - My first `AI_MODE` line in `.env.local` was spelled `AI-MODE` (hyphen). The code reads `AI_MODE` (underscore), so no simulated line appeared. Claude found it by listing only the variable names in my file. I fixed the spelling and restarted.
+  - After testing, `AI_MODE=score-claim` was still in `.env.local`. It must be deleted (then restart `npm run dev`) or every interview keeps using the fake AI.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add API failure handling (Guardrail C), retry cooldown and simulated failures
+- **Commit hash:** d888c6b
