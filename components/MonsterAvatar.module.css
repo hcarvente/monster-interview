@@ -1,0 +1,26 @@
+.orb {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, var(--surface-raised), var(--surface));
+  border: 2px solid var(--neon-purple);
+  box-shadow: 0 0 24px rgba(184, 107, 255, 0.45);
+}
+
+.md {
+  width: 96px;
+  height: 96px;
+}
+
+.lg {
+  width: 140px;
+  height: 140px;
+}
+
+.md .emoji {
+  font-size: 3rem;
+}
+
+.lg .emoji {
+  font-size: 4.5rem;
+}
