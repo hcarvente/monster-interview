@@ -1,0 +1,110 @@
+/* The scene fills the whole screen and stays put while the page scrolls.
+   z-index: -1 puts it BEHIND the landing content (the landing screen creates its own
+   stacking context with `isolation: isolate`, so -1 means "behind its content",
+   not "behind the page background"). pointer-events: none means it can never block a click. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* The drawing sits on the bottom edge and is at most 70% of the screen tall, so the
+   title and cards at the top of the page keep a plain dark background. */
+.svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: min(70vh, 640px);
+}
+
+/* Silhouettes are just slightly lighter than the page background (#0d0617), so they
+   read as a shape without competing with the text in front of them. */
+.house,
+.fence,
+.ground {
+  fill: #170b27;
+}
+
+.fence {
+  fill: #1d0f33;
+}
+
+.tree {
+  stroke: #1d0f33;
+}
+
+.ground {
+  fill: #12081f;
+}
+
+.door {
+  fill: #0a0412;
+}
+
+/* Lit windows: warm orange with a soft glow. */
+.window {
+  fill: #ff9a3c;
+  filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.75));
+}
+
+/* Animation only for people who have not asked for reduced motion. Without it the
+   windows simply stay lit and the bats stay still. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Two different flicker rhythms so the windows never blink in sync. */
+  .flickerA {
+    animation: flicker 5s infinite;
+  }
+
+  .flickerB {
+    animation: flicker 7s infinite 1.3s;
+  }
+
+  /* Bats slowly drift left and right. */
+  .bat {
+    animation: drift 11s ease-in-out infinite alternate;
+  }
+
+  .batTwo {
+    animation-duration: 15s;
+    animation-delay: -4s;
+  }
+
+  .batThree {
+    animation-duration: 13s;
+    animation-delay: -7s;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  46% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  52% {
+    opacity: 0.5;
+  }
+  54% {
+    opacity: 1;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-30px);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}

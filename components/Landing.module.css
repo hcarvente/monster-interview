@@ -12,6 +12,10 @@
   align-items: center;
   text-align: center;
   gap: 16px;
+  /* Makes this screen its own stacking context, so the backdrop (z-index: -1) stays
+     behind the screen's content but in front of the page background. */
+  position: relative;
+  isolation: isolate;
 }
 
 /* "Monster Interview" title. clamp(min, preferred, max) scales the font size

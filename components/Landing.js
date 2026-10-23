@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { CHARACTERS } from "@/lib/characters";
 import CharacterCard from "./CharacterCard";
+import HauntedScene from "./HauntedScene";
 import styles from "./Landing.module.css";
 
 // The first screen: branding, tagline, character cards, and the Enter button.
@@ -15,6 +16,9 @@ export default function Landing({ onEnter }) {
 
   return (
     <main className={styles.landing}>
+      {/* Decorative haunted-house backdrop. It sits behind everything else. */}
+      <HauntedScene />
+
       {/* Branding and tagline. */}
       <h1 className={styles.brand}>Monster Interview</h1>
       <p className={styles.tagline}>
