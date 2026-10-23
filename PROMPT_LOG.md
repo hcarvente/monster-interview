@@ -671,13 +671,13 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Concepts learned:** ES module `export`/`import`; a single source of truth for shared constants; CSS custom properties (`var(--orange)`); data lookups returning `null` for unknown ids (used later by input validation).
 - **How I tested:**
   - Claude ran a Node check: 3 categories each with exactly 3 questions, only Dracula playable, unknown ids return `null`.
-  - Me: `npm run dev`, open http://localhost:3000 and check the background: ____
-- **Test results:** Node check passed (output above). Browser check: ____
+  - Me: `npm run dev`, open http://localhost:3000 and check the background.
+- **Test results:** Node check passed (output above). Browser check: `npm run dev` ran successfully and a Next.js page showed on screen (I did not report a specific check of the purple background).
 - **Problems / errors:** Node printed a `MODULE_TYPELESS_PACKAGE_JSON` warning because `package.json` has no `"type": "module"`. Harmless for now; to be handled when tests are added (Step 5).
 - **Claude mistakes I identified:**
 - **Corrections made:**
-- **Git commit message:**
-- **Commit hash:**
+- **Git commit message:** Add questions, characters data and theme variables
+- **Commit hash:** c0b0c09
 
 ---
 
@@ -696,5 +696,5 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Problems / errors:** None so far. Keyboard focus ring was not reported as checked.
 - **Claude mistakes I identified:**
 - **Corrections made:**
-- **Git commit message:**
-- **Commit hash:**
+- **Git commit message:** Add landing screen and character selection
+- **Commit hash:** 7c2335a
