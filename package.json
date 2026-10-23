@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test \"tests/**/*.test.js\""
+    "test": "node --test \"tests/**/*.test.js\"",
+    "cost": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/cost-report.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.31.0",

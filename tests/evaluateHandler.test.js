@@ -287,6 +287,22 @@ test("logs never contain the user's answers or raw provider details", async () =
   assert.ok(succeeding.logs.some((line) => line.includes("tokens in=800 out=300")));
 });
 
+// ---------- Cost in the log ----------
+
+test("the log line includes an estimated cost when the model's price is known", async () => {
+  const { handle, logs } = setup(() => ({ text: JSON.stringify(GOOD_REPLY), usage: USAGE, model: "gemini-3.5-flash-lite" }));
+  await handle(body());
+  const line = logs.find((l) => l.includes("tokens in="));
+  assert.ok(line.includes("est.cost=$"), line);
+});
+
+test("no cost is logged for a model we have no price for", async () => {
+  const { handle, logs } = setup(() => ({ text: JSON.stringify(GOOD_REPLY), usage: USAGE, model: "mystery-model" }));
+  await handle(body());
+  const line = logs.find((l) => l.includes("tokens in="));
+  assert.equal(line.includes("est.cost"), false);
+});
+
 // ---------- The dev-only simulated behaviors ----------
 
 test("every simulated AI_MODE produces the intended outcome", async () => {
