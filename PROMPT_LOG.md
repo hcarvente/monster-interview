@@ -746,3 +746,51 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **How I tested:** Claude ran `next build` after each round; it compiled successfully.
 - **Git commit message:** Add explanatory comments to components and CSS
 - **Commit hash:** 78e7ef5
+
+---
+
+## Step 5a — Request validation (Guardrail A)
+- **Objective:** Build the server-side input validator and unit-test it before anything calls it.
+- **My prompt:** "Contie" (continue), after Step 4 was logged and pushed.
+- **Files changed:** `lib/validateRequest.js` (new), `tests/validateRequest.test.js` (new), `package.json` (added `"test"` script).
+- **Why:**
+  - `validateRequest(body)` is a pure function (no network, no AI), so it can be tested without spending tokens.
+  - It treats the body as untrusted: plain object, playable character, known category, exactly 3 answers, each a non-empty string (after trimming) of at most 800 characters.
+  - It returns only `characterId`, `categoryId` and trimmed `answers`, so extra client-sent fields are dropped.
+- **Concepts learned:** Pure functions; why the server re-validates what the browser already checked; one-thing-broken-per-test style; the difference between input validation and prompt injection (validation can't tell an instruction from an answer; that defense comes from the system prompt in Step 6 and output validation in Step 7).
+- **How I tested:** `npm test` (Node's built-in test runner, 17 tests).
+- **Test results:** Per me: `npm test` passed.
+- **Problems / errors:**
+  - `node --test tests/` failed on Node 24 (it read `tests/` as a module path). Fixed by using the glob `"tests/**/*.test.js"`.
+  - Node prints a harmless `MODULE_TYPELESS_PACKAGE_JSON` warning because `package.json` has no `"type": "module"`. Left as is for now.
+- **Claude mistakes I identified:**
+- **Corrections made:** (Claude's own first `test` script failed on Node 24; Claude changed it to a glob pattern. See Problems.)
+- **Git commit message:** Add request validation (Guardrail A) with unit tests
+- **Commit hash:** 4b7e512
+
+---
+
+## Step 5b — Mock API route and submit flow
+- **Objective:** Add `/api/evaluate` returning a hard-coded mock (no AI yet), plus the client `fetch`, loading and error screens, and a duplicate-submit lock.
+- **My prompt:** "yes start 5b"
+- **Files changed:** `app/api/evaluate/route.js` (new), `components/ErrorBanner.js` + `.module.css` (new), `app/page.js` (submit logic, `loading` and `error` screens, placeholder results).
+- **Why:**
+  - The route reads JSON inside try/catch, runs `validateRequest`, then returns a mock after a 1.5-second fake delay so the loading state and duplicate guard can be seen. The real AI call replaces the mock in Step 6.
+  - An in-memory `inFlight` set rejects an identical request while one is running (HTTP 409 `DUPLICATE_REQUEST`).
+  - The client locks with a `useRef` (state updates apply too late for a fast double click) and always unlocks in `finally`.
+  - Answers are never cleared on failure; retry is a deliberate button click, never automatic.
+- **Concepts learned:** Route Handlers (exported `POST` function; the folder path becomes the URL); `request.json()` can throw; `Response.json(body, { status })`; HTTP status codes (400, 405, 409); `fetch` throws `TypeError` when offline; `finally` for cleanup; what runs in the browser vs the server.
+- **How I tested:**
+  - Claude ran `next build` (compiled; `/api/evaluate` listed) and `curl` requests against the dev server.
+  - Me: browser test with DevTools Network set to Offline, then back online and Try again.
+- **Test results:**
+  - curl: malformed JSON gave 400; whitespace-only answer gave 400; zombie character gave 400; a second identical request while the first was running gave 409 while the first got 200; a normal request gave 200 with mock feedback; GET gave 405.
+  - Browser, per me: the offline test worked.
+  - Not separately reported by me: the loading screen on a normal submit and "Back to my answers" from the error screen.
+- **Problems / errors:**
+  - Claude's temporary second dev server failed because Next allows only one `next dev` per project (mine was already on port 3000); Claude ran the curl tests against the existing server instead.
+  - When I stopped and restarted the dev server to test retry, the page reloaded and my answers were gone. Cause: a full page reload wipes React state. That is expected, and the plan only covers errors, not reloads. The right test is DevTools Offline, which does not reload.
+- **Claude mistakes I identified:** Claude suggested stopping the dev server as the way to force an error, which resets the page and so cannot test retry.
+- **Corrections made:** Switched the test to DevTools Offline.
+- **Git commit message:** Add mock evaluate API route and submit flow with loading and error states
+- **Commit hash:** 5d2d62c
