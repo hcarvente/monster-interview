@@ -1,0 +1,83 @@
+/* Page container: centered column, capped at 560px wide. */
+.wrapper {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 64px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+/* The error panel: red border so it reads as a problem. */
+.banner {
+  width: 100%;
+  padding: 24px;
+  background: var(--surface);
+  border: 2px solid var(--danger);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  font-size: 1.4rem;
+  color: var(--danger);
+}
+
+.message {
+  line-height: 1.5;
+}
+
+/* Reassurance that nothing the user typed was lost. */
+.reassure {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Row holding the two buttons. */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Shared shape for both buttons; colors are set separately below. */
+.back,
+.retry {
+  padding: 12px 28px;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* Back: outlined, low emphasis. */
+.back {
+  color: var(--foreground);
+  background: transparent;
+  border: 2px solid var(--border);
+}
+
+.back:hover {
+  border-color: var(--neon-purple);
+}
+
+/* Try again: solid orange, the main action. */
+.retry {
+  color: #1a0f2b;
+  background: var(--orange);
+  border: none;
+  box-shadow: 0 0 24px rgba(255, 122, 26, 0.4);
+}
+
+/* Keyboard focus outline for both buttons. */
+.back:focus-visible,
+.retry:focus-visible {
+  outline: 3px solid var(--neon-purple);
+  outline-offset: 3px;
+}

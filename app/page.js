@@ -2,10 +2,11 @@
 // We need that because it uses useState (memory that changes as the user clicks).
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Landing from "@/components/Landing";
 import SetupScreen from "@/components/SetupScreen";
 import InterviewScreen from "@/components/InterviewScreen";
+import ErrorBanner from "@/components/ErrorBanner";
 import { getCharacter } from "@/lib/characters";
 import { getCategory, QUESTIONS_PER_INTERVIEW } from "@/lib/questions";
 
@@ -27,6 +28,13 @@ export default function Home() {
   const [answers, setAnswers] = useState(emptyAnswers);
   // Which question we're on (0, 1 or 2). The screen shows this number + 1.
   const [questionIndex, setQuestionIndex] = useState(0);
+  // The feedback object returned by the server (null until we get one).
+  const [feedback, setFeedback] = useState(null);
+  // The friendly message shown on the error screen.
+  const [errorMessage, setErrorMessage] = useState("");
+  // Duplicate-submit lock. A ref (not state) because it changes instantly:
+  // state updates are applied later, so a fast second click could slip through.
+  const isSubmitting = useRef(false);
 
   // Called by the landing screen when the user clicks "Enter the Interview".
   function handleEnter(id) {
@@ -64,6 +72,52 @@ export default function Home() {
     }
   }
 
+  // Sends the finished interview to OUR server (never directly to an AI provider).
+  // Runs only when the user clicks "Reveal My Fate" or "Try again": not on typing,
+  // navigating or refreshing. Only ids and answers are sent; the server looks up
+  // the question text itself.
+  async function submitInterview() {
+    // If a request is already running, ignore this click.
+    if (isSubmitting.current) return;
+    isSubmitting.current = true;
+    setScreen("loading");
+
+    try {
+      const response = await fetch("/api/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ characterId, categoryId, answers }),
+      });
+
+      // The server replies with JSON for both success and errors. If the body is
+      // not JSON for some reason, fall back to null instead of crashing.
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        // Show the server's friendly message when there is one.
+        throw new Error(
+          data?.error?.message ?? "Something went wrong. Please try again."
+        );
+      }
+
+      setFeedback(data.feedback);
+      setScreen("results");
+    } catch (error) {
+      // fetch itself throws a TypeError when the network is down. Show a friendly
+      // message instead of the raw technical one. `answers` is untouched, so the
+      // user can retry without retyping anything.
+      setErrorMessage(
+        error instanceof TypeError
+          ? "Could not reach the server. Check your connection and try again."
+          : error.message
+      );
+      setScreen("error");
+    } finally {
+      // Always unlock, success or failure, so a deliberate retry is possible.
+      isSubmitting.current = false;
+    }
+  }
+
   // Each `if` below shows one screen and stops, so only one screen renders at a time.
   if (screen === "landing") {
     return <Landing onEnter={handleEnter} />;
@@ -96,16 +150,38 @@ export default function Home() {
         onChangeAnswer={handleChangeAnswer}
         onNext={() => setQuestionIndex(questionIndex + 1)}
         onBack={handleInterviewBack}
-        onFinish={() => setScreen("results")}
+        onFinish={submitInterview}
       />
     );
   }
 
-  // Placeholder until the API route and results screen exist (Steps 5-9).
-  // No AI call is made here.
+  // Waiting for the server. role="status" lets screen readers announce it politely.
+  if (screen === "loading") {
+    return (
+      <main style={{ padding: 32 }} role="status">
+        <p>The monsters are judging your answers...</p>
+      </main>
+    );
+  }
+
+  if (screen === "error") {
+    return (
+      <ErrorBanner
+        message={errorMessage}
+        onRetry={submitInterview}
+        onBack={() => {
+          setQuestionIndex(QUESTIONS_PER_INTERVIEW - 1);
+          setScreen("interview");
+        }}
+      />
+    );
+  }
+
+  // Placeholder results until the real ResultsScreen exists (Step 9).
   return (
     <main style={{ padding: 32 }}>
-      <p>Results coming later. Your answers are saved in state.</p>
+      <p>{feedback?.title}</p>
+      <p>{feedback?.overall}</p>
       <button
         onClick={() => {
           // Jump back to the last question so the user can review their answers.
