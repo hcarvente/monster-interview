@@ -716,5 +716,33 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Problems / errors:** None reported.
 - **Claude mistakes I identified:**
 - **Corrections made:**
-- **Git commit message:**
-- **Commit hash:**
+- **Git commit message:** Add setup screen with category selection
+- **Commit hash:** 1e46094
+
+---
+
+## Step 4b — Interview screen
+- **Objective:** Build the interview screen: one question at a time, textarea, progress indicator, validation, and Back/Next that keep typed answers.
+- **My prompt:** "yes commit and push, then start 4b"
+- **Files changed:** `components/InterviewScreen.js` + `.module.css`, `components/ProgressBar.js` + `.module.css` (all new); `app/page.js` (added `answers` and `questionIndex` state and renders `InterviewScreen`; results screen is a placeholder, no API call).
+- **Why:**
+  - `answers` lives in `page.js` so Back, Next and leaving the screen never lose typed text; `InterviewScreen` is a controlled component.
+  - Validation (empty or whitespace-only blocks Next, shown with `role="alert"`) is for UX only; the server will re-validate in Step 5.
+  - `maxLength={MAX_ANSWER_CHARS}` reuses the shared 800-character limit.
+  - Changing category clears answers because the questions differ (a decision Claude added beyond the plan).
+- **Concepts learned:** Controlled components; lifting state up; immutable state updates (`map` to build a new array); `trim()` for whitespace-only checks; ARIA for progress bars and error messages.
+- **How I tested:** `npm run dev` at http://localhost:3000. Claude also ran `next build`, which compiled successfully.
+- **Test results:** Per me: the 4b test passed. I could type up to 800 characters and go forward and backward with nothing deleted. Keyboard focus and the 375px width also worked. The empty and whitespace-only error message showed, and answers cleared when I changed category.
+- **Problems / errors:** None reported.
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:** Add interview screen with progress bar and answer validation
+- **Commit hash:** 3b57ebf
+
+### Step 4 follow-up — Explanatory comments
+- **Objective:** Make the code easier for me to reread and learn from.
+- **My prompt:** "I need you to make sure you are adding descriptions on all chunks of code that are commented out which I can go back and read and see what everything is doing." / "yes add comments to the CSS too"
+- **Files changed:** Comment-only changes to `app/page.js`, `components/*.js` and `.module.css`, and `app/globals.css`. No logic or style values changed.
+- **How I tested:** Claude ran `next build` after each round; it compiled successfully.
+- **Git commit message:** Add explanatory comments to components and CSS
+- **Commit hash:** 78e7ef5
