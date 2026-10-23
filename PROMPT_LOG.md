@@ -648,8 +648,8 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **How I tested:**
   - Claude ran `git check-ignore -v .env.local .env.example`: `.env.local` matched the ignore rule (`.gitignore` line 34); `.env.example` matched the exception (line 35), so it is not ignored.
   - I ran `git add .` then `git ls-files | grep -i env`.
-  - `npm run dev` and opening http://localhost:3000: ____ (fill in what you saw)
-- **Test results:** `git ls-files | grep -i env` listed only `.env.example`, so no secret file is tracked. Dev server result: ____
+  - `npm run dev` and opening http://localhost:3000.
+- **Test results:** `git ls-files | grep -i env` listed only `.env.example`, so no secret file is tracked. The dev server ran and showed the default Next.js page.
 - **Problems / errors:**
   - `create-next-app` refused to run in this folder because its name `monster-Interview` has a capital letter (npm package names must be lowercase). Workaround: scaffolded in a temp folder named `monster-interview` and copied the files in; the folder name was not changed.
   - A `.git` folder already existed (likely left by the failed first `create-next-app` run). It had no commits, so it was harmless.
@@ -658,3 +658,23 @@ Present your proposed plan and stop so I can review and approve it before we beg
 - **Corrections made:**
 - **Git commit message:** Set up Next.js app, openai SDK, and env safety
 - **Commit hash:** f499427
+---
+
+## Step 2 — Data files and theme
+- **Objective:** Store the fixed interview content and character info in the project, and set the dark purple / orange / neon theme colors.
+- **My prompt:** "Yes, the run dev showed the next.js page. Lets go with step 2"
+- **Files changed:** `lib/questions.js` (new), `lib/characters.js` (new), `app/globals.css` (theme variables, gradient background, font), `PROMPT_LOG.md`.
+- **Why:**
+  - `lib/questions.js`: 3 categories x 3 fixed questions plus the limits `MAX_ANSWER_CHARS = 800` and `QUESTIONS_PER_INTERVIEW = 3`. The server will look questions up itself, so the browser can't tamper with them and fewer tokens are sent. One shared limit means the form and the server validation agree.
+  - `lib/characters.js`: Dracula is `available: true`; Zombie Boss and Friendly Ghost are `available: false` (shown as "coming soon" later).
+  - `app/globals.css`: CSS variables (`--orange`, `--neon-purple`, `--surface`, ...) so components never repeat hex codes.
+- **Concepts learned:** ES module `export`/`import`; a single source of truth for shared constants; CSS custom properties (`var(--orange)`); data lookups returning `null` for unknown ids (used later by input validation).
+- **How I tested:**
+  - Claude ran a Node check: 3 categories each with exactly 3 questions, only Dracula playable, unknown ids return `null`.
+  - Me: `npm run dev`, open http://localhost:3000 and check the background: ____
+- **Test results:** Node check passed (output above). Browser check: ____
+- **Problems / errors:** Node printed a `MODULE_TYPELESS_PACKAGE_JSON` warning because `package.json` has no `"type": "module"`. Harmless for now; to be handled when tests are added (Step 5).
+- **Claude mistakes I identified:**
+- **Corrections made:**
+- **Git commit message:**
+- **Commit hash:**
