@@ -13,6 +13,7 @@
   --orange-soft: #ffb066;     /* gentler orange for small labels */
   --neon-purple: #b86bff;     /* hover and focus accent */
   --danger: #ff6b81;          /* error messages */
+  --good: #7be0a4;            /* positive feedback (strengths) */
   --radius: 14px;             /* shared corner rounding */
 }
 

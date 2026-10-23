@@ -7,6 +7,7 @@ import Landing from "@/components/Landing";
 import SetupScreen from "@/components/SetupScreen";
 import InterviewScreen from "@/components/InterviewScreen";
 import ErrorBanner from "@/components/ErrorBanner";
+import ResultsScreen from "@/components/ResultsScreen";
 import { getCharacter } from "@/lib/characters";
 import { getCategory, QUESTIONS_PER_INTERVIEW } from "@/lib/questions";
 
@@ -70,6 +71,18 @@ export default function Home() {
     } else {
       setQuestionIndex(questionIndex - 1);
     }
+  }
+
+  // "Play again": wipe everything from the last interview and return to the start.
+  // The next interview must not inherit old answers or old feedback.
+  function handleRestart() {
+    setCharacterId(null);
+    setCategoryId(null);
+    setAnswers(emptyAnswers());
+    setQuestionIndex(0);
+    setFeedback(null);
+    setErrorMessage("");
+    setScreen("landing");
   }
 
   // Sends the finished interview to OUR server (never directly to an AI provider).
@@ -177,20 +190,25 @@ export default function Home() {
     );
   }
 
-  // Placeholder results until the real ResultsScreen exists (Step 9).
+  // Final screen: show the validated feedback. If somehow there is none, fall back
+  // to the start instead of rendering a broken page.
+  if (!feedback) {
+    return <Landing onEnter={handleEnter} />;
+  }
+
+  const category = getCategory(categoryId);
   return (
-    <main style={{ padding: 32 }}>
-      <p>{feedback?.title}</p>
-      <p>{feedback?.overall}</p>
-      <button
-        onClick={() => {
-          // Jump back to the last question so the user can review their answers.
-          setQuestionIndex(QUESTIONS_PER_INTERVIEW - 1);
-          setScreen("interview");
-        }}
-      >
-        Back to my answers
-      </button>
-    </main>
+    <ResultsScreen
+      character={getCharacter(characterId)}
+      feedback={feedback}
+      // Look up the text of the question the improved answer refers to (1-based -> 0-based).
+      improvedQuestion={category.questions[feedback.improvedAnswer.questionNumber - 1]}
+      onRestart={handleRestart}
+      onReview={() => {
+        // Back to the last question with every answer still filled in.
+        setQuestionIndex(QUESTIONS_PER_INTERVIEW - 1);
+        setScreen("interview");
+      }}
+    />
   );
 }
