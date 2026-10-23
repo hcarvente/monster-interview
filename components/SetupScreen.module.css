@@ -1,3 +1,4 @@
+/* Page container: centered column, capped at 640px wide. */
 .setup {
   width: 100%;
   max-width: 640px;
@@ -10,22 +11,26 @@
   gap: 16px;
 }
 
+/* Character name heading. */
 .name {
   font-size: clamp(1.8rem, 6vw, 2.6rem);
   color: var(--orange);
 }
 
+/* Explanation paragraph. */
 .intro {
   color: var(--muted);
   line-height: 1.5;
 }
 
+/* "Choose an interview category" label. */
 .heading {
   margin-top: 16px;
   font-size: 1.1rem;
   color: var(--neon-purple);
 }
 
+/* Holds the category buttons in a vertical list. */
 .options {
   width: 100%;
   display: flex;
@@ -33,6 +38,7 @@
   gap: 12px;
 }
 
+/* One category button: a card with a label and a description stacked inside. */
 .option {
   display: flex;
   flex-direction: column;
@@ -48,37 +54,44 @@
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Hover: lift slightly and turn the border purple. */
 .option:hover {
   transform: translateY(-2px);
   border-color: var(--neon-purple);
 }
 
+/* Keyboard focus outline, for accessibility. */
 .option:focus-visible {
   outline: 3px solid var(--orange);
   outline-offset: 3px;
 }
 
+/* The chosen category: orange border and glow. */
 .selected {
   border-color: var(--orange);
   box-shadow: 0 0 22px rgba(255, 122, 26, 0.35);
 }
 
+/* Category name inside the card. */
 .label {
   font-weight: 700;
   font-size: 1.05rem;
 }
 
+/* Category description inside the card. */
 .description {
   color: var(--muted);
   font-size: 0.9rem;
 }
 
+/* Row holding the Back and Start buttons. */
 .actions {
   margin-top: 16px;
   display: flex;
   gap: 12px;
 }
 
+/* Shared shape for both buttons; colors are set separately below. */
 .back,
 .start {
   padding: 12px 28px;
@@ -88,6 +101,7 @@
   cursor: pointer;
 }
 
+/* Back: outlined, low emphasis. */
 .back {
   color: var(--foreground);
   background: transparent;
@@ -98,6 +112,7 @@
   border-color: var(--neon-purple);
 }
 
+/* Start Interview: solid orange, the main action. */
 .start {
   color: #1a0f2b;
   background: var(--orange);
@@ -105,18 +120,21 @@
   box-shadow: 0 0 24px rgba(255, 122, 26, 0.4);
 }
 
+/* Disabled (no category yet): faded, no glow, not-allowed cursor. */
 .start:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
 }
 
+/* Keyboard focus outline for both buttons. */
 .back:focus-visible,
 .start:focus-visible {
   outline: 3px solid var(--neon-purple);
   outline-offset: 3px;
 }
 
+/* "Pick a category to begin." hint. */
 .hint {
   color: var(--muted);
   font-size: 0.9rem;

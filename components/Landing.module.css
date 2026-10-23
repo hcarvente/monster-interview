@@ -1,3 +1,7 @@
+/* CSS Modules: these class names are scoped to Landing.js only, so they can't
+   clash with class names in other components. */
+
+/* Page container: centered column, capped at 960px wide, with space around it. */
 .landing {
   width: 100%;
   max-width: 960px;
@@ -10,24 +14,30 @@
   gap: 16px;
 }
 
+/* "Monster Interview" title. clamp(min, preferred, max) scales the font size
+   with the screen width but never below 2.4rem or above 4.5rem. */
 .brand {
   font-size: clamp(2.4rem, 8vw, 4.5rem);
   line-height: 1.05;
   color: var(--orange);
-  text-shadow: 0 0 28px rgba(255, 122, 26, 0.45);
+  text-shadow: 0 0 28px rgba(255, 122, 26, 0.45); /* orange glow */
 }
 
+/* Tagline under the title. */
 .tagline {
   color: var(--muted);
   font-size: clamp(1rem, 3vw, 1.25rem);
 }
 
+/* "Choose your interviewer" label. */
 .heading {
   margin-top: 32px;
   font-size: 1.1rem;
   color: var(--neon-purple);
 }
 
+/* Grid of character cards: as many columns of at least 220px as fit, so the
+   cards sit side by side on desktop and stack on a phone. */
 .grid {
   width: 100%;
   display: grid;
@@ -35,6 +45,7 @@
   gap: 16px;
 }
 
+/* "Enter the Interview" button: orange pill with a glow. */
 .enter {
   margin-top: 24px;
   padding: 14px 36px;
@@ -44,17 +55,19 @@
   color: #1a0f2b;
   background: var(--orange);
   border: none;
-  border-radius: 999px;
+  border-radius: 999px; /* huge radius = fully rounded ends */
   cursor: pointer;
   box-shadow: 0 0 24px rgba(255, 122, 26, 0.4);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Hover: grow slightly and glow brighter. */
 .enter:hover {
   transform: scale(1.05);
   box-shadow: 0 0 34px rgba(255, 122, 26, 0.6);
 }
 
+/* Visible outline when reached by keyboard (Tab), for accessibility. */
 .enter:focus-visible {
   outline: 3px solid var(--neon-purple);
   outline-offset: 3px;

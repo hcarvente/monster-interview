@@ -1,29 +1,37 @@
 /* Monster Interview theme: dark purple base, orange highlights, neon purple accents */
+
+/* CSS variables ("custom properties"). Defined once here, used anywhere as
+   var(--name), so a color can be changed in one place for the whole app. */
 :root {
-  --background: #0d0617;
-  --surface: #1a0f2b;
-  --surface-raised: #261640;
-  --border: #3d2566;
-  --foreground: #f4ecff;
-  --muted: #b9a6d6;
-  --orange: #ff7a1a;
-  --orange-soft: #ffb066;
-  --neon-purple: #b86bff;
-  --danger: #ff6b81;
-  --radius: 14px;
+  --background: #0d0617;      /* near-black purple page background */
+  --surface: #1a0f2b;         /* cards and inputs sit on this */
+  --surface-raised: #261640;  /* slightly lighter, for glows and highlights */
+  --border: #3d2566;          /* default outline color */
+  --foreground: #f4ecff;      /* main text color */
+  --muted: #b9a6d6;           /* softer text for descriptions */
+  --orange: #ff7a1a;          /* main highlight (buttons, selected items) */
+  --orange-soft: #ffb066;     /* gentler orange for small labels */
+  --neon-purple: #b86bff;     /* hover and focus accent */
+  --danger: #ff6b81;          /* error messages */
+  --radius: 14px;             /* shared corner rounding */
 }
 
+/* Tell the browser this is a dark page so built-in controls (scrollbars,
+   inputs) use dark styling. */
 html {
   height: 100%;
   color-scheme: dark;
 }
 
+/* Prevent sideways scrolling on narrow phones. */
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
+/* Page-wide look: purple glow in the top-left corner over the dark background,
+   light text, and the Geist font set up in app/layout.js. */
 body {
   min-height: 100%;
   display: flex;
@@ -40,12 +48,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Reset: remove the browser's default spacing on every element, and make
+   width include padding and border so sizes are predictable. */
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
+/* Links look like surrounding text, with no underline. */
 a {
   color: inherit;
   text-decoration: none;

@@ -1,3 +1,5 @@
+/* The glowing circle behind the emoji: a gradient disc with a neon purple
+   ring. display: grid + place-items: center puts the emoji in the middle. */
 .orb {
   display: grid;
   place-items: center;
@@ -7,6 +9,7 @@
   box-shadow: 0 0 24px rgba(184, 107, 255, 0.45);
 }
 
+/* Size options, picked by the `size` prop in MonsterAvatar.js. */
 .md {
   width: 96px;
   height: 96px;
@@ -17,6 +20,7 @@
   height: 140px;
 }
 
+/* Emoji size for each orb size. ".md .emoji" means "an .emoji inside a .md". */
 .md .emoji {
   font-size: 3rem;
 }
